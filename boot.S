@@ -1,5 +1,5 @@
 /* set the multiboot constants */
-.set MULTIBOOT_MAGIC,              0x2BADB002
+.set MULTIBOOT_MAGIC,              0x1BADB002
 .set MULTIBOOT_FLAG_PAGE_ALIGN,   1 << 0
 .set MULTIBOOT_FLAG_MEM_MAP,      1 << 1
 .set MULTIBOOT_FLAG_VIDEO_FLAG,   1 << 2
