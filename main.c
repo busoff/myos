@@ -19,7 +19,7 @@ void printAt(const char* str, uint8_t x, uint8_t y)
     /* a chararcter shwon on screen is represented as uint16_t
      * lowest 8 bit is ASCII and high 8 bits are color
      */
-    uint16_t * video_buffer = 0xB8000;
+    volatile uint16_t * video_buffer = (volatile uint16_t*) 0xB8000;
     const uint8_t white_color = 15;
 
     uint8_t x_pos = x;
