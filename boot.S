@@ -2,8 +2,8 @@
 .set MULTIBOOT_MAGIC,              0x1BADB002
 .set MULTIBOOT_FLAG_PAGE_ALIGN,   1 << 0
 .set MULTIBOOT_FLAG_MEM_MAP,      1 << 1
-.set MULTIBOOT_FLAG_VIDEO_FLAG,   1 << 2
-.set MULTIBOOT_FLAGS,             MULTIBOOT_FLAG_PAGE_ALIGN | MULTIBOOT_FLAG_MEM_MAP | MULTIBOOT_FLAG_VIDEO_FLAG
+; .set MULTIBOOT_FLAG_VIDEO_FLAG,   1 << 2
+.set MULTIBOOT_FLAGS,             MULTIBOOT_FLAG_PAGE_ALIGN | MULTIBOOT_FLAG_MEM_MAP
 .set MULTIBOOT_CHECKSUM,           -(MULTIBOOT_MAGIC + MULTIBOOT_FLAGS)
 
 /* set the multiboot header */
@@ -24,7 +24,7 @@
 .long 0 
 .long 0
 .long 0
-.long 32  /* 32 bit per pexel*/
+.long 0  /* 32 bit per pexel*/
 
 .section .bss
 stack_bottom:
@@ -43,7 +43,7 @@ and $-16, %esp
 /* disable interrupt */
 cli
 
-pushl %esp
+pushl %esp /* why push %esp? */
 pushl %eax /* magic number */
 pushl %ebx /* multiboot information */
 
