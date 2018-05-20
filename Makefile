@@ -3,9 +3,9 @@ KERNEL_PREFIX = i686-elf-
 CC = ${KERNEL_PREFIX}gcc
 AS = ${KERNEL_PREFIX}as
 
-C_FLAGS = -g -std=gnu11 -ffreestanding  -Wall -Wextra
+C_FLAGS = -g -std=gnu11 -ffreestanding -fno-stack-protector -Wall -Wextra -Werror
 
-OBJECTS = main.o boot.o
+OBJECTS = main.o boot.o gdt.o kstdlib.o
 
 all: myos.iso
 
@@ -16,7 +16,7 @@ clean:
 	${CC} ${C_FLAGS} -o $@ -c $<
 
 %.o: %.S
-	${AS} -o $@ -c $< 
+	${AS} -o $@ -c $<
 
 myos.bin: ${OBJECTS} linker.ld
 	${CC} -T linker.ld -o $@ -ffreestanding -nostdlib ${OBJECTS}

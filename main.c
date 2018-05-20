@@ -1,6 +1,8 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#include "gdt.h"
+
 /**
  * @brief print a char at a given position on a screen 80 * 25
  */
@@ -16,7 +18,7 @@ void printAt(const char* str, uint8_t x, uint8_t y)
         return;
     }
 
-    /* a chararcter shwon on screen is represented as uint16_t
+    /* a chararcter shown on screen is represented as uint16_t
      * lowest 8 bit is ASCII and high 8 bits are color
      */
     volatile uint16_t * video_buffer = (volatile uint16_t*) 0xB8000;
@@ -51,6 +53,7 @@ void kmain(void* multiboot_information, uint32_t magic_number)
     (void) multiboot_information;
     (void) magic_number;
 
+    gdt_install();
     printAt("Hello MyOS", 0, 0);
 
     while(1)
