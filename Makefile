@@ -7,10 +7,10 @@ INCLUDE_PATH := -Iarch -Istdlib
 C_FLAGS := -g -std=gnu11 -ffreestanding -fno-stack-protector -Wall -Wextra -Werror ${INCLUDE_PATH}
 
 C_SRC := arch/gdt.c  stdlib/kstdlib.c main.c
-ASSEMBLY_SRC := arch/boot.S
+ASM_SRC := arch/boot.S arch/gdt_flush.S
 
 OBJECTS :=  $(patsubst %.c, objects/%.o, $(C_SRC))
-OBJECTS += $(patsubst %.S, objects/%.o, $(ASSEMBLY_SRC))
+OBJECTS += $(patsubst %.S, objects/%.o, $(ASM_SRC))
 
 all: myos.iso
 

@@ -1,12 +1,14 @@
 #include "gdt.h"
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "kstdlib.h"
 
 static void gdt_init();
-static void gdt_install_segment(uint8_t index, uint32_t base, uint32_t limit, uint8_t access, uint8_t flags);
-static void gdt_store_gdtr();
+static void gdt_install_segment(uint8_t index, uint32_t base, uint32_t limit, bool granua4k, uint8_t access);
+
+void flush_gdt(void* gdtr); /* defined in gdt.S */
 
 /**
  * @brief segment descriptor structure
@@ -32,10 +34,20 @@ struct gdtr
     uint32_t base;
 } __attribute__((packed));
 
-static struct segment_descriptor gdt[8];
+static struct segment_descriptor gdt[3];
 static size_t gdt_cnt = 0;
 static uint8_t CODE_SEGMENT = 1;
 static uint8_t DATA_SEGMENT = 2;
+
+static const uint8_t ACCESS_PRESENT_FLAG = 1 << 7;
+static const uint8_t ACCESS_PRIV_RING0_FLAG = ((0 << 5) & 0x3);
+static const uint8_t ACCESS_RESERVED_FLAG = 1 << 4;
+static const uint8_t ACCESS_EXE_FLAG = 1 << 3;
+static const uint8_t ACCESS_READ_FLAG = 1 << 1;
+static const uint8_t ACCESS_WRITE_FLAG = 1 << 1;
+
+static const uint8_t GRANULARITY_FLAG = 1 << 3;
+static const uint8_t BIT_32_FLAG = 1 << 2;
 
 void gdt_init()
 {
@@ -45,48 +57,51 @@ void gdt_init()
     DATA_SEGMENT = 2;
 }
 
+
 /**
  *
  */
-void gdt_install_segment(uint8_t index, uint32_t base, uint32_t limit, uint8_t access, uint8_t flags)
+void gdt_install_segment(uint8_t index, uint32_t base, uint32_t limit, bool granua4k, uint8_t access)
 {
-    (void)base;
-    (void)access;
-    (void)flags;
-
-    gdt[index].limit_low = limit & 0xffff;
     gdt[index].base_low = base & 0xffff;
     gdt[index].base_mid = (base >> 16) & 0xff;
-    gdt[index].access = (base >> 16) & 0xff;
-    gdt[index].flags_limit_high = ((flags & 0xf) << 4) | ((limit >> 16) & 0xf);
     gdt[index].base_high = (base >> 24) & 0xff;
-}
 
-void gdt_store_gdtr()
-{
-    struct gdtr gdtr_val = {.size = sizeof(gdt) - 1, .base = (uint32_t)&gdt};
-    asm volatile("lgdt %0"::"m" (gdtr_val));
+    uint8_t granularity = granua4k ? GRANULARITY_FLAG: 0;
+
+    uint8_t flag = ((BIT_32_FLAG | granularity) & 0xf ) << 4;
+    gdt[index].flags_limit_high = flag | ((limit >> 16) & 0xf);
+    gdt[index].limit_low = limit & 0xffff;
+
+    gdt[index].access = access;
 }
 
 void gdt_install()
 {
     gdt_init();
 
+    gdt_install_segment(0,0,0,0,0);
+
     /* code segment
      * base: 0
      * limit: 0xfffff
      * access: pr=1, privi=0, ex=1, dc=0, rw=1, ac=0
-     * flags: gr=1,sz=0
+     * flags: gr=1,sz=1
      */
-    gdt_install_segment(CODE_SEGMENT, 0, 0, 0x9a, 0x8);
+    gdt_install_segment(CODE_SEGMENT, 0, 0xfffff, true,
+        ACCESS_PRESENT_FLAG | ACCESS_PRIV_RING0_FLAG | ACCESS_RESERVED_FLAG |
+        ACCESS_EXE_FLAG  | ACCESS_READ_FLAG);
 
     /* data segment
      * base: 0
      * limit: 0xfffff
-     * access: pr=1, privi=0, ex=0, dc=1, rw=1, ac=0
-     * flags: gr=1,sz=0
+     * access: pr=1, privi=0, ex=0, dc=0, rw=1, ac=0
+     * flags: gr=1,sz=1
      */
-    gdt_install_segment(DATA_SEGMENT, 0, 0, 0x96, 0x8);
+    gdt_install_segment(DATA_SEGMENT, 0, 0xfffff, true,
+        ACCESS_PRESENT_FLAG | ACCESS_PRIV_RING0_FLAG | ACCESS_RESERVED_FLAG |
+        !ACCESS_EXE_FLAG | ACCESS_WRITE_FLAG);
 
-    gdt_store_gdtr();
+    struct gdtr gdtr_val = {.size = sizeof(gdt) - 1, .base = (uint32_t)&gdt};
+    flush_gdt(&gdtr_val);
 }
