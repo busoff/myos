@@ -29,7 +29,21 @@ myos.bin: ${OBJECTS} linker.ld
 	${CC} -T linker.ld -o $@ -ffreestanding -nostdlib ${OBJECTS}
 
 myos.iso: myos.bin
-	cp myos.bin iso/boot
+	rm -rf iso
+	mkdir iso
+	mkdir -p iso/boot/grub
+
+	cp $< iso/boot/
+
+	echo 'set timeout=0' > iso/boot/grub/grub.cfg
+	echo 'set default=0' >> iso/boot/grub/grub.cfg
+	echo '' >> iso/boot/grub/grub.cfg
+	echo 'menuentry "My OS" {'>> iso/boot/grub/grub.cfg
+	echo '    multiboot /boot/myos.bin' >> iso/boot/grub/grub.cfg
+	echo '    boot' >> iso/boot/grub/grub.cfg
+	echo '}' >> iso/boot/grub/grub.cfg
+	cat iso/boot/grub/grub.cfg
+
 	grub-mkrescue --output=myos.iso iso
 
 run: myos.iso
