@@ -1,21 +1,28 @@
-KERNEL_PREFIX = i686-elf-
+KERNEL_PREFIX := i686-elf-
 
-CC = ${KERNEL_PREFIX}gcc
-AS = ${KERNEL_PREFIX}as
+CC := ${KERNEL_PREFIX}gcc
+AS := ${KERNEL_PREFIX}as
 
-C_FLAGS = -g -std=gnu11 -ffreestanding -fno-stack-protector -Wall -Wextra -Werror
+INCLUDE_PATH := -Iarch -Istdlib
+C_FLAGS := -g -std=gnu11 -ffreestanding -fno-stack-protector -Wall -Wextra -Werror ${INCLUDE_PATH}
 
-OBJECTS = main.o boot.o gdt.o kstdlib.o
+C_SRC := arch/gdt.c  stdlib/kstdlib.c main.c
+ASSEMBLY_SRC := arch/boot.S
+
+OBJECTS :=  $(patsubst %.c, objects/%.o, $(C_SRC))
+OBJECTS += $(patsubst %.S, objects/%.o, $(ASSEMBLY_SRC))
 
 all: myos.iso
 
 clean:
-	rm -rf *.o *.bin *.iso
+	rm -rf *.o *.bin *.iso objects
 
-%.o: %.c
+objects/%.o: %.c
+	mkdir -p $(dir $@)
 	${CC} ${C_FLAGS} -o $@ -c $<
 
-%.o: %.S
+objects/%.o: %.S
+	mkdir -p $(dir $@)
 	${AS} -o $@ -c $<
 
 myos.bin: ${OBJECTS} linker.ld
@@ -32,3 +39,7 @@ run: myos.iso
 debug: myos.iso
 	(killall qemu-system-i386 && sleep 1 ) || true
 	qemu-system-i386 -cdrom $< -m 32 -s -S -monitor stdio
+
+
+# print variable for debugging
+print-%  : ; @echo $* = $($*)
