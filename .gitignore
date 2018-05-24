@@ -3,3 +3,6 @@
 *.iso
 iso
 .vscode
+Gemfile
+Gemfile.lock
+_site
