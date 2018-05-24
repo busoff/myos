@@ -8,7 +8,7 @@
 static void gdt_init();
 static void gdt_install_segment(uint8_t index, uint32_t base, uint32_t limit, bool granua4k, uint8_t access);
 
-void flush_gdt(void* gdtr); /* defined in gdt.S */
+void load_gdtr(void* gdtr); /* defined in gdt.S */
 
 /**
  * @brief segment descriptor structure
@@ -103,5 +103,5 @@ void gdt_install()
         !ACCESS_EXE_FLAG | ACCESS_WRITE_FLAG);
 
     struct gdtr gdtr_val = {.size = sizeof(gdt) - 1, .base = (uint32_t)&gdt};
-    flush_gdt(&gdtr_val);
+    load_gdtr(&gdtr_val);
 }
