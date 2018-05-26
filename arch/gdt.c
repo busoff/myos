@@ -57,7 +57,6 @@ void gdt_init()
     DATA_SEGMENT = 2;
 }
 
-
 /**
  *
  */
@@ -104,4 +103,14 @@ void gdt_install()
 
     struct gdtr gdtr_val = {.size = sizeof(gdt) - 1, .base = (uint32_t)&gdt};
     load_gdtr(&gdtr_val);
+}
+
+uint16_t gdt_code_segment()
+{
+    return CODE_SEGMENT * 8;
+}
+
+uint16_t gdt_data_segment()
+{
+    return DATA_SEGMENT * 8;
 }
