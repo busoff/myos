@@ -12,7 +12,6 @@ qemu-system-i386 -fda <your image>
 - Debug your image  
 ```sh
 $ qemu-system-i386 -fda <your image> -s -S
-# In qumu console, enter
 $ gdb
 ``` 
 
