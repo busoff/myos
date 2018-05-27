@@ -6,4 +6,6 @@
 
 void memset(void* buffer, size_t len, uint8_t value);
 
+void halt();
+
 #endif //_KSTDLIB_H_

@@ -1,5 +1,6 @@
 #include "kstdlib.h"
 
+#include <stdbool.h>
 
 void memset(void* buffer, size_t len, uint8_t value)
 {
@@ -10,4 +11,10 @@ void memset(void* buffer, size_t len, uint8_t value)
     {
         b[i] = value;
     }
+}
+
+void halt()
+{
+    while(true)
+    {}
 }
