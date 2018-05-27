@@ -17,6 +17,8 @@ load_gdtr:
     mov %ax, %ds
     mov %ax, %ss
     mov %ax, %es
+    mov %ax, %fs
+    mov %ax, %gs
 
     /* store cs by jumping*/
     ljmp $0x08, $flush_cs
