@@ -8,7 +8,7 @@
     .type _ISR\number, @function
     ISR\number:
         push $0x00 /* a dummy error code*/
-        push \number /* interrupt number */
+        push $\number /* interrupt number */
         jmp common_interrupt
 
         add $8, %esp /* 'pop up' interrupt number and error code */
@@ -20,10 +20,10 @@
     .type _ISR\number, @function
     ISR\number:
          /*the CPU push an error code before interrupt number here*/
-        push \number
+        push $\number
         jmp common_interrupt
 
-        add $8, %esp /* 'pop up' interrupt number and error code */
+        add $4, %esp /* 'pop up' interrupt number */
         iret
 .endm
 
@@ -68,13 +68,9 @@ ISR_NOERR 127
     IRQ\number:
         cli
         push $0x00 /*a dummy error code for compatible to some CPU exceptions*/
-        push \number + BASE_NUMBER /* push interrupt number from 0x20 */
+        push $(\number + BASE_NUMBER) /* push interrupt number from 0x20 */
 
         jmp common_interrupt
-
-        add  $8, %esp /* pop the interrupt number and error code */
-
-        iret
 .endm
 
 IRQ 0
@@ -107,11 +103,12 @@ common_interrupt:
     push %gs
 
     /* link to the data segment*/
-    mov 0x10, %ax
+    mov $0x10, %ax
     mov %ax, %ds
     mov %ax, %es
     mov %ax, %fs
     mov %ax, %gs
+    cld
 
     push %esp
     call dispatch_interrupt
@@ -123,3 +120,6 @@ common_interrupt:
     pop %ds
 
     popa
+
+    add  $8, %esp /* pop the interrupt number and error code */
+    iret
