@@ -1,4 +1,4 @@
-#include "gdt.h"
+#include "arch/gdt.h"
 
 #include <stdint.h>
 #include <stdbool.h>

@@ -3,7 +3,7 @@ KERNEL_PREFIX := i686-elf-
 CC := ${KERNEL_PREFIX}gcc
 AS := ${KERNEL_PREFIX}as
 
-INCLUDE_PATH := -Iarch -Istdlib -Idriver
+INCLUDE_PATH := -Istdlib -I.
 C_FLAGS := -g -std=gnu11 -ffreestanding -fno-stack-protector -Wall -Wextra -Werror ${INCLUDE_PATH}
 
 C_SRC := arch/gdt.c  stdlib/kstdlib.c main.c arch/isr.c arch/idt.c arch/port.c

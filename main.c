@@ -1,9 +1,9 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#include "gdt.h"
-#include "idt.h"
-#include "screen.h"
+#include "arch/gdt.h"
+#include "arch/idt.h"
+#include "driver/screen.h"
 
 // /**
 //  * @brief print a char at a given position on a screen 80 * 25

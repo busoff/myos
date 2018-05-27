@@ -1,10 +1,10 @@
-#include "idt.h"
+#include "arch/idt.h"
 
 #include <stdbool.h>
 
-#include "gdt.h"
+#include "arch/gdt.h"
 #include "kstdlib.h"
-#include "port.h"
+#include "arch/port.h"
 
 extern void ISR0();
 extern void ISR1();

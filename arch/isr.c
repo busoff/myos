@@ -1,4 +1,5 @@
-#include "isr.h"
+#include "arch/isr.h"
+#include "driver/screen.h"
 
 static interrupt_handler_t isr_table[256];
 
