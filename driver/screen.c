@@ -62,24 +62,7 @@ void scr_puts(const char* str)
     const char* s = str;
     while(*s != 0)
     {
-        if (*s != '\n')
-        {
-            scr_putchar_at(*s, currentx, currenty);
-        }
-
-        if (*s == '\n')
-        {
-            newline(&currentx, &currenty);
-        }
-        else
-        {
-            currentx++;
-            if (currentx >= WIDTH)
-            {
-                newline(&currentx, &currenty);
-            }
-        }
-
+        scr_putchar(*s);
         s++;
     }
 }
