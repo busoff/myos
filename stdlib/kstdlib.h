@@ -12,6 +12,4 @@ void putchar(char ch);
 
 void puts(const char* str);
 
-void halt();
-
 #endif //_KSTDLIB_H_

@@ -12,9 +12,3 @@ void memset(void* buffer, size_t len, uint8_t value)
         b[i] = value;
     }
 }
-
-void halt()
-{
-    while(true)
-    {}
-}

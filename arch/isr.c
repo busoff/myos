@@ -65,7 +65,12 @@ void isr_dispatch(struct regs regs)
         if (regs.interrupt_num < 32)
         {
             kprintf("exception happen: %s (ISR%d)\n", exception_messages[regs.interrupt_num], regs.interrupt_num);
-            halt();
+
+            // the system halts
+            while(true)
+            {
+
+            }
         }
         else
         {
