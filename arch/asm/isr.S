@@ -90,8 +90,8 @@ IRQ 13
 IRQ 14
 IRQ 15
 
-.global dispatch_interrupt
-.type dispatch_interrupt, @function
+.global isr_dispatch
+.type isr_dispatch, @function
 
 common_interrupt:
     pusha /* push all registers */
@@ -111,7 +111,7 @@ common_interrupt:
     cld
 
     push %esp
-    call dispatch_interrupt
+    call isr_dispatch
     add $4, %esp /*pop up %esp*/
 
     pop %gs

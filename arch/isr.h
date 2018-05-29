@@ -27,7 +27,9 @@ struct regs
 
 typedef void (*interrupt_handler_t)(struct regs);
 
-void register_isr(uint32_t interrupt, interrupt_handler_t handler);
-void dispatch_interrupt(struct regs registers);
+void isr_register(uint32_t interrupt, interrupt_handler_t handler);
+void isr_dispatch(struct regs registers);
+void isr_enable();
+void isr_disable();
 
 #endif // _ISR_H_
