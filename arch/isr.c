@@ -1,5 +1,4 @@
 #include "arch/isr.h"
-#include "driver/screen.h"
 #include "kstdlib.h"
 #include "port.h"
 
@@ -65,14 +64,13 @@ void isr_dispatch(struct regs regs)
     {
         if (regs.interrupt_num < 32)
         {
-            scr_puts("exception happen: ");
-            scr_puts(exception_messages[regs.interrupt_num]);
+            kprintf("exception happen: %s (ISR%d)\n", exception_messages[regs.interrupt_num], regs.interrupt_num);
             halt();
         }
         else
         {
             /* TODO: "handle missing interrupt" */
-            scr_puts("missing handler for IRQ\n");
+            kprintf("missing handler for IRQ%d\n", regs.interrupt_num);
         }
 
     }
@@ -82,7 +80,7 @@ void isr_register(uint32_t interrupt, interrupt_handler_t handler)
 {
     if (interrupt >= 256)
     {
-        scr_puts("ERR: exceeds maximum interrupt number 256\n");
+        kprintf("ERR: exceeds maximum interrupt number 256\n");
         return;
     }
     isr_table[interrupt] = handler;

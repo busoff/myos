@@ -6,7 +6,8 @@ AS := ${KERNEL_PREFIX}as
 INCLUDE_PATH := -Istdlib -I.
 C_FLAGS := -g -std=gnu11 -ffreestanding -fno-stack-protector -Wall -Wextra -Werror ${INCLUDE_PATH}
 
-C_SRC := arch/gdt.c  stdlib/kstdlib.c main.c arch/isr.c arch/idt.c arch/port.c
+C_SRC := main.c arch/gdt.c arch/isr.c arch/idt.c arch/port.c
+C_SRC += stdlib/io.c stdlib/string.c stdlib/kprintf.c
 C_SRC += driver/screen.c
 
 ASM_SRC := arch/asm/boot.S arch/asm/gdt.S arch/asm/isr.S arch/asm/idt.S

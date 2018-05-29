@@ -4,7 +4,7 @@
 #include "arch/gdt.h"
 #include "arch/idt.h"
 #include "arch/isr.h"
-#include "driver/screen.h"
+#include "kstdlib.h"
 
 void kmain(void* multiboot_information, uint32_t magic_number)
 {
@@ -14,13 +14,12 @@ void kmain(void* multiboot_information, uint32_t magic_number)
     gdt_install();
     idt_install();
 
-    // isr_enable();
+    isr_enable();
 
-    scr_puts("Hello MyOS\nhello again");
+    kprintf("==%c===%s %d\n", '!', "Hello MyOS\nhello again");
 
-    // int b = 0;
-    // int a = 1/b;
-    // (void)a;
+    kprintf("%d, %d, 0x%x\n", 1234567, -1234567, 0x1234567);
+
     while(1)
     {
 
