@@ -67,7 +67,7 @@ void isr_dispatch(struct regs regs)
             kprintf("exception happen: %s (ISR%d)\n", exception_messages[regs.interrupt_num], regs.interrupt_num);
 
             // the system halts
-            while(true)
+            while(1)
             {
 
             }
