@@ -22,9 +22,9 @@ caller:
 
 - what is different to %ebp and %esp?  
 - How `call` actually do?
- store the address of instruction follows `call` on stack
+ `push` the address of instruction follows `call` on the stack and `jump` to the given code location
 - How `ret` do?
- store the address saved by call on stack to `EIP`
+ pop the code location on stack and jump to that location by setting the location to `EIP`
 
 - How subroutine save local variable on stack
 
@@ -52,3 +52,4 @@ directive | syntax | comment
 ## reference:  
 - https://en.wikibooks.org/wiki/X86_Assembly/GAS_Syntax
 - https://gist.github.com/mishurov/6bcf04df329973c15044
+- http://www.cs.virginia.edu/~evans/cs216/guides/x86.html
