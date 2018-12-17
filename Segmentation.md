@@ -104,10 +104,21 @@ GDT is an array of segment descriptors. A segment descriptor defines a segment w
   - `bit 4`: always 1
   - `bit 5,6 (privilege bits)`: ring level. 0 = highest (kernel) 3 = lowest (user application)
   - `bit 7 (present bit)`: must be 1 for all valid segments 
+  
+### An example of GDT
+|Index |	Offset 	| Name |	Address range |	Type |	DPL |
+|------|--------------------|------|--------------------|-----------|-----|
+|0  |	0x00 |	null descriptor 	|		
+1 |	0x08 |	kernel code segment 	| 0x00000000 - 0xFFFFFFFF | RX |	PL0 |
+2 |	0x10 |	kernel data segment 	| 0x00000000 - 0xFFFFFFFF |	RW |	PL0|
 
-## GDTR
+### GDTR
 
-
+GDT register store the address of GDT and the size
+```c
+struct gdtr gdtr_val = {.size = sizeof(gdt) - 1, .base = (uint32_t)&gdt};
+load_gdtr(&gdtr_val);
+```
 
 
 ## Reference
