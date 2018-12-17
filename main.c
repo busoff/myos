@@ -4,6 +4,9 @@
 #include "arch/gdt.h"
 #include "arch/idt.h"
 #include "arch/isr.h"
+
+#include "driver/keyboard.h"
+
 #include "kstdlib.h"
 
 void kmain(void* multiboot_information, uint32_t magic_number)
@@ -13,6 +16,8 @@ void kmain(void* multiboot_information, uint32_t magic_number)
 
     gdt_install();
     idt_install();
+
+    keyboard_init();
 
     isr_enable();
 

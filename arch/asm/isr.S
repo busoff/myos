@@ -94,6 +94,10 @@ IRQ 15
 .type isr_dispatch, @function
 
 common_interrupt:
+    /*
+     * save environment before entering interrupt routine
+     */
+
     pusha /* push all registers */
 
     /*push segments*/
@@ -112,9 +116,13 @@ common_interrupt:
 
     push %esp
     call isr_dispatch
-    add $4, %esp /*pop up %esp*/
 
-    pop %gs
+    /**
+     * restore saved environment after exit interrupt routine
+     */
+    add $4, %esp /*esp currently points to old %esp, skip the the current one*/
+
+    pop %gs /*restore %esp*/
     pop %fs
     pop %es
     pop %ds
