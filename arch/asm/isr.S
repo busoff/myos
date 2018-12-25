@@ -3,18 +3,7 @@
 
 .set BASE_NUMBER, 0x20
 
-.macro ISR_NOERR number
-    .global ISR\number
-    .type _ISR\number, @function
-    ISR\number:
-        push $0x00 /* a dummy error code*/
-        push $\number /* interrupt number */
-        jmp common_interrupt
-
-        add $8, %esp /* 'pop up' interrupt number and error code */
-        iret
-.endm
-
+/* use for exception with error code pushed on stack by CPU */
 .macro ISR_ERROR number
     .global ISR\number
     .type _ISR\number, @function
@@ -24,6 +13,20 @@
         jmp common_interrupt
 
         add $4, %esp /* 'pop up' interrupt number */
+        iret
+.endm
+
+
+/* use for exception without error code provided by CPU */
+.macro ISR_NOERR number
+    .global ISR\number
+    .type _ISR\number, @function
+    ISR\number:
+        push $0x00 /* a dummy error code*/
+        push $\number /* interrupt number */
+        jmp common_interrupt
+
+        add $8, %esp /* 'pop up' interrupt number and error code */
         iret
 .endm
 
@@ -62,6 +65,7 @@ ISR_NOERR 30
 ISR_NOERR 31
 ISR_NOERR 127
 
+/* used for interrupt */
 .macro IRQ number
     .global IRQ\number
     .type IRQ\number, @function
