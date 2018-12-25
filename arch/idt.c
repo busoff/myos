@@ -71,7 +71,7 @@ static void idt_remap_irqs();
 static const uint8_t IDT_FLAG_PRESENT = 1 << 7;
 static const uint8_t IDT_FLAG_DPL_RING0 = 0 << 5;
 static const uint8_t IDT_FLAG_STORAGE = 0;
-static const uint8_t IDT_FLAG_GATE_TRAP32 = 0xF;
+static const uint8_t IDT_FLAG_GATE_INT32 = 0xE;
 
 static const uint8_t IRQ_BASE = 0x20;
 
@@ -109,7 +109,7 @@ void idt_install_interrupt(uint8_t interrupt_num, uint16_t segment, uint32_t off
 
 #define ISR_ENTRY(number)                                                                                            \
     do {                                                                                                             \
-        const uint8_t IDT_FLAGS = (IDT_FLAG_PRESENT | IDT_FLAG_DPL_RING0 | IDT_FLAG_STORAGE | IDT_FLAG_GATE_TRAP32); \
+        const uint8_t IDT_FLAGS = (IDT_FLAG_PRESENT | IDT_FLAG_DPL_RING0 | IDT_FLAG_STORAGE | IDT_FLAG_GATE_INT32); \
         idt_install_interrupt(number, gdt_code_segment(), (uint32_t)ISR##number, IDT_FLAGS);                         \
     }while(false)
 
@@ -154,7 +154,7 @@ void idt_install_isrs()
 
 #define IRQ_ENTRY(number)                                                                                            \
     do {                                                                                                             \
-        const uint8_t IDT_FLAGS = (IDT_FLAG_PRESENT | IDT_FLAG_DPL_RING0 | IDT_FLAG_STORAGE | IDT_FLAG_GATE_TRAP32); \
+        const uint8_t IDT_FLAGS = (IDT_FLAG_PRESENT | IDT_FLAG_DPL_RING0 | IDT_FLAG_STORAGE | IDT_FLAG_GATE_INT32); \
         idt_install_interrupt(number + IRQ_BASE, gdt_code_segment(), (uint32_t)IRQ##number, IDT_FLAGS);                         \
     }while(false)
 
@@ -218,6 +218,10 @@ static void idt_remap_irqs()
 	/* Request 8086 mode on each PIC */
 	outb(PIC1_DATA_PORT, 0x01); PIC_WAIT();
 	outb(PIC2_DATA_PORT, 0x01); PIC_WAIT();
+
+    /* set interrupt mask register to enable all interrupts except interrupt 7 and interrupt 15*/
+	outb(PIC1_DATA_PORT, 0x80); PIC_WAIT();
+	outb(PIC2_DATA_PORT, 0x80); PIC_WAIT();
 }
 
 void idt_install()
