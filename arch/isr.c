@@ -2,7 +2,9 @@
 #include "kstdlib.h"
 #include "port.h"
 
-static const char *exception_messages[32] = {
+#define MAX_ISR  32
+
+static const char* exception_messages[MAX_ISR] = {
     "Division by zero",
     "Debug",
     "Non-maskable interrupt",
@@ -37,66 +39,39 @@ static const char *exception_messages[32] = {
     "Reserved"
 };
 
-static interrupt_handler_t isr_table[256];
-
-static uint8_t PIC_CMD_EOI = 0x20; /* end of interrupt command*/
+static isr_handler_t isr_table[MAX_ISR];
 
 void isr_dispatch(struct regs regs)
 {
-    if (isr_table[regs.interrupt_num] != 0)
+    if (regs.int_num < MAX_ISR)
     {
-        isr_table[regs.interrupt_num](regs);
-    }
-    else /* default interrupt handling for interrupt without handler */
-    {
-        if (regs.interrupt_num < 32)
+        kprintf("exception happen: %s (ISR%d)\n", exception_messages[regs.int_num], regs.int_num);
+        if (isr_table[regs.int_num] != 0)
         {
-            kprintf("exception happen: %s (ISR%d)\n", exception_messages[regs.interrupt_num], regs.interrupt_num);
-
-            // the system halts
-            while(1)
-            {
-
-            }
-        }
-        else
-        {
-            /* TODO: "handle missing interrupt" */
-            // kprintf("missing handler for IRQ%d\n", regs.interrupt_num);
+            isr_table[regs.int_num](regs);
         }
 
-    }
+        while (1)
+        {
 
-    /*
-     * send EOI to PIC1 or PIC2 upon completion of interrupt, otherwise
-     * the interrupt will be ignored by PICs
-     */
-    if (regs.interrupt_num >= 32 && regs.interrupt_num <= 39)
-    {
-        outb(0x20, PIC_CMD_EOI);
+        }
     }
-    else if (regs.interrupt_num >= 40 && regs.interrupt_num <= 47)
+    else
     {
-        outb(0xA0, PIC_CMD_EOI);
+        kprintf("ERR: invalid isr number");
     }
 }
 
-void isr_register(uint32_t interrupt, interrupt_handler_t handler)
+bool isr_register(uint32_t interrupt, isr_handler_t handler)
 {
-    if (interrupt >= 256)
+    if (interrupt >= MAX_ISR)
     {
-        kprintf("ERR: exceeds maximum interrupt number 256\n");
-        return;
+        kprintf("ERR: exceeds maximum interrupt number %d\n", MAX_ISR);
+        return false;
     }
+
     isr_table[interrupt] = handler;
+
+    return true;
 }
 
-void isr_enable()
-{
-    __asm__ volatile ("sti");
-}
-
-void isr_disable()
-{
-    __asm__ volatile ("cli");
-}

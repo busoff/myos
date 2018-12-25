@@ -1,8 +1,6 @@
 .section .text
 .align 4
 
-.set BASE_NUMBER, 0x20
-
 /* use for exception with error code pushed on stack by CPU */
 .macro ISR_ERROR number
     .global ISR\number
@@ -64,35 +62,6 @@ ISR_NOERR 29
 ISR_NOERR 30
 ISR_NOERR 31
 ISR_NOERR 127
-
-/* used for interrupt */
-.macro IRQ number
-    .global IRQ\number
-    .type IRQ\number, @function
-    IRQ\number:
-        cli
-        push $0x00 /*a dummy error code for compatible to some CPU exceptions*/
-        push $(\number + BASE_NUMBER) /* push interrupt number from 0x20 */
-
-        jmp common_interrupt
-.endm
-
-IRQ 0
-IRQ 1
-IRQ 2
-IRQ 3
-IRQ 4
-IRQ 5
-IRQ 6
-IRQ 7
-IRQ 8
-IRQ 9
-IRQ 10
-IRQ 11
-IRQ 12
-IRQ 13
-IRQ 14
-IRQ 15
 
 .global isr_dispatch
 .type isr_dispatch, @function

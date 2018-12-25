@@ -25,7 +25,12 @@ struct regs
     uint32_t eflags;
 }  __attribute__((packed));
 
-typedef void (*isr_handler_t)(struct regs);
+typedef void (*irq_handler_t)(struct regs);
 
-bool isr_register(uint32_t number, isr_handler_t handler);
-void isr_dispatch(struct regs registers);
+bool irq_register(uint32_t number, irq_handler_t handler);
+
+void irq_enable();
+void irq_disable();
+
+/* should be called by isr.s */
+void irq_dispatch(struct regs registers);
