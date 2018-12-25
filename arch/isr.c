@@ -46,19 +46,6 @@ void isr_dispatch(struct regs regs)
     if (isr_table[regs.interrupt_num] != 0)
     {
         isr_table[regs.interrupt_num](regs);
-
-        /*
-         * send EOI to PIC1 or PIC2 upon completion of interrupt, otherwise
-         * the interrupt will be ignored by PICs
-         */
-        if ( regs.interrupt_num >= 32 && regs.interrupt_num <= 39)
-        {
-            outb(0x20, PIC_CMD_EOI);
-        }
-        else if (regs.interrupt_num >= 40 && regs.interrupt_num <= 47)
-        {
-            outb(0xA0, PIC_CMD_EOI);
-        }
     }
     else /* default interrupt handling for interrupt without handler */
     {
@@ -75,9 +62,22 @@ void isr_dispatch(struct regs regs)
         else
         {
             /* TODO: "handle missing interrupt" */
-            kprintf("missing handler for IRQ%d\n", regs.interrupt_num);
+            // kprintf("missing handler for IRQ%d\n", regs.interrupt_num);
         }
 
+    }
+
+    /*
+     * send EOI to PIC1 or PIC2 upon completion of interrupt, otherwise
+     * the interrupt will be ignored by PICs
+     */
+    if (regs.interrupt_num >= 32 && regs.interrupt_num <= 39)
+    {
+        outb(0x20, PIC_CMD_EOI);
+    }
+    else if (regs.interrupt_num >= 40 && regs.interrupt_num <= 47)
+    {
+        outb(0xA0, PIC_CMD_EOI);
     }
 }
 
