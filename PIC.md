@@ -1,6 +1,6 @@
 # Programmable interrupt controller (PIC)
 
-PIC is an chip that accept the interrupt from the connected hardware devices and feeds the interrupt to CPU. For example, when there is a keyboard hit, the PIC will be signaled via one of its IRQ pins. Then PIC translate the IRQ to a particular system interrupt number and feed it to the CPU. 
+8259 PIC is an chip that accept the interrupt from the connected hardware devices and feeds the interrupt to CPU. For example, when there is a keyboard hit, the PIC will be signaled via one of its IRQ pins. Then PIC translate the IRQ to a particular system interrupt number and feed it to the CPU.  It combines 8 interrupt into 1 interrupt which connects to CPU. then this increase the capability of handling interrupt in CPU.
 
 
 ## Port
