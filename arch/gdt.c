@@ -79,6 +79,9 @@ void gdt_install()
 {
     gdt_init();
 
+    /*
+     * null segment
+     */
     gdt_install_segment(0,0,0,0,0);
 
     /* code segment
@@ -101,6 +104,7 @@ void gdt_install()
         ACCESS_PRESENT_FLAG | ACCESS_PRIV_RING0_FLAG | ACCESS_RESERVED_FLAG |
         !ACCESS_EXE_FLAG | ACCESS_WRITE_FLAG);
 
+    /* set gdt register */
     struct gdtr gdtr_val = {.size = sizeof(gdt) - 1, .base = (uint32_t)&gdt};
     load_gdtr(&gdtr_val);
 }
