@@ -3,7 +3,7 @@
 
 #include "arch/gdt.h"
 #include "arch/idt.h"
-#include "arch/isr.h"
+#include "arch/irq.h"
 
 #include "driver/keyboard.h"
 
@@ -19,11 +19,15 @@ void kmain(void* multiboot_information, uint32_t magic_number)
 
     keyboard_init();
 
-    isr_enable();
+    irq_enable();
 
     kprintf("==%c===%s %d\n", '!', "Hello MyOS\nhello again");
 
     kprintf("%d, %d, 0x%x\n", 1234567, -1234567, 0x1234567);
+
+    // verify ISR interrupt
+    // uint8_t value = 0;
+    // value = 1/value;
 
     while(1)
     {
