@@ -1,1 +1,1 @@
-- [] implement kprintf in kstdlib.h
+- [x] implement kprintf in kstdlib.h
