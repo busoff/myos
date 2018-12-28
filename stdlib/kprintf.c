@@ -1,8 +1,13 @@
 #include "kstdlib.h"
 #include <stdarg.h>
+#include <stdbool.h>
 #include "driver/screen.h"
 
-static char* convert(uint32_t number, uint8_t base)
+/**
+ * NOTE!!!!  Only support print up to 63 characters. if the size of result excces,
+ * this function won't behaviour correctly. 
+ */
+static char* convert(uint32_t number, uint8_t base, char padding, uint8_t len_spec)
 {
     static const char represents[]= "0123456789ABCDEF";
     static char buffer[64];
@@ -15,12 +20,16 @@ static char* convert(uint32_t number, uint8_t base)
         number = number/base;
     }while (number > 0);
 
+    uint8_t len = &buffer[sizeof(buffer)-1] - p;
+    if (len < len_spec) {
+        for(uint8_t i = 0; i < len_spec - len; ++i)
+            *(--p) = padding;
+    }
     return p;
 }
 
 void kprintf(const char *format, ...)
 {
-
     va_list arg;
     va_start(arg, format);
 
@@ -37,9 +46,21 @@ void kprintf(const char *format, ...)
         }
 
         ch++;
-        if (ch == '\0')
+        if (*ch == '\0')
         {
             return;
+        }
+
+        /* calcualte padding size */
+        char padding = ' ';
+        uint8_t len_spec = 0;
+        if (*ch == '0') {
+            padding = '0';
+            
+            while(isdigit(*(++ch))) {
+                len_spec *= 10;
+                len_spec += *ch - '0';
+            }
         }
 
         switch (*ch)
@@ -61,7 +82,7 @@ void kprintf(const char *format, ...)
             case 'x':
             {
                 uint32_t n = va_arg(arg, uint32_t);
-                puts(convert(n, 16));
+                puts(convert(n, 16, padding, len_spec));
                 break;
             }
             case 'd':
@@ -70,18 +91,18 @@ void kprintf(const char *format, ...)
                 if (v<0)
                 {
                     putchar('-');
-                    puts(convert(-v, 10));
+                    puts(convert(-v, 10, padding, len_spec));
                 }
                 else
                 {
-                    puts(convert(v, 10));
+                    puts(convert(v, 10, padding, len_spec));
                 }
                 break;
             }
             default:
-            /* known format */
-            putchar('%');
-            putchar(*ch);
+                /* unknown format */
+                putchar('%');
+                putchar(*ch);
         }
     }
 }

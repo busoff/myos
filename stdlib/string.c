@@ -12,3 +12,8 @@ void memset(void* buffer, size_t len, uint8_t value)
         b[i] = value;
     }
 }
+
+bool isdigit(char ch)
+{
+    return  ('0' <= ch) && (ch <= '9');
+}
