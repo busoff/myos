@@ -25,6 +25,8 @@ void kmain(void* multiboot_information, uint32_t magic_number)
 
     kprintf("%d, %d, 0x%x\n", 1234567, -1234567, 0x1234567);
 
+    kprintf("format: %018d, %08x\n", 0x1234567, 0x1234567);
+
     // verify ISR interrupt
     // uint8_t value = 0;
     // value = 1/value;
