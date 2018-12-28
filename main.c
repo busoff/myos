@@ -9,6 +9,12 @@
 
 #include "kstdlib.h"
 
+static void keyboard_handler(key_event_t event)
+{
+    kprintf("keycode: %d modifier: %02x action: %d\n", 
+        event.keycode, event.modifiers, event.action);
+}
+
 void kmain(void* multiboot_information, uint32_t magic_number)
 {
     (void) multiboot_information;
@@ -18,6 +24,8 @@ void kmain(void* multiboot_information, uint32_t magic_number)
     idt_install();
 
     keyboard_init();
+
+    keyboard_register(keyboard_handler);
 
     irq_enable();
 

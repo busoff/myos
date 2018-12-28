@@ -1,4 +1,5 @@
 #include "osdev/input/keycode.h"
+#include "osdev/input/keyboard.h"
 #include "driver/keyboard.h"
 #include "arch/irq.h"
 #include "kstdlib.h"
@@ -7,14 +8,6 @@
 static const uint32_t KEYBOARD_IRQ = 1;
 static const uint8_t DATA_PORT = 0x60;
 
-// static bool shift = false;
-// static bool lshift = false;
-// static bool rshift = false;
-
-/* This is based on the definition from linux/drivers/input/keyboard/hpps2atkbd.h.
- * The difference is that the value above 0x80 is always set to KEY_RESERVED. This
- * respect the rule of "release-scancode = 0x80 | press-scancode"
- * */
 static uint16_t keymap[256] = {
 /* 00 */  KEY_RESERVED, KEY_ESC,       KEY_1,         KEY_2,         KEY_3,         KEY_4,        KEY_5,         KEY_6,
 /* 08 */  KEY_7,        KEY_8,         KEY_9,         KEY_0,         KEY_MINUS,     KEY_EQUAL,    KEY_BACKSPACE, KEY_TAB,
@@ -86,24 +79,97 @@ uint16_t keymap_ext[256] = {
 /* f8 */  KEY_RESERVED, KEY_RESERVED,  KEY_RESERVED,  KEY_RESERVED,  KEY_RESERVED,  KEY_RESERVED, KEY_RESERVED,  KEY_RESERVED 
 };
 
+static kbd_handler_func handler = 0;
+void keyboard_register(kbd_handler_func func)
+{
+    handler = func;
+}
+
+
+static uint16_t update_modifier(uint16_t modifiers, uint8_t keycode, bool up)
+{
+    uint8_t modifier = 0;
+    uint16_t newmodifiers = modifiers;
+
+    /* 
+     * update LOCK modifier 
+     * toggle the bit if DOWN (ONLY care about DOWN)
+     */
+    if (keycode == KEY_CAPSLOCK && !up)
+    {
+        newmodifiers ^= KEY_MOD_CAPSLOCK;
+        return newmodifiers;
+    }
+    else if (keycode == KEY_NUMLOCK && !up)
+    {
+        newmodifiers ^= KEY_MOD_NUMLOCK;
+        return newmodifiers;
+    }
+
+    /* 
+     * update shift/ctrl/alt modifier
+     * set bit if UP and clear bit if DOWN
+     */
+    switch (keycode)
+    {
+        case KEY_LEFTCTRL:
+            modifier = KEY_MOD_LCTRL;
+            break;
+        case KEY_RIGHTCTRL:
+            modifier = KEY_MOD_RCTRL;
+            break;
+        case KEY_LEFTALT:
+            modifier = KEY_MOD_LALT;
+            break;
+        case KEY_RIGHTALT:
+            modifier = KEY_MOD_RALT;
+            break;
+        case KEY_LEFTSHIFT:
+            modifier = KEY_MOD_LSHIFT;
+            break;
+        case KEY_RIGHTSHIFT:
+            modifier = KEY_MOD_RSHIFT;
+            break;
+        default:
+            break;
+    } 
+
+    if (modifier != 0) // modifier hit
+    {
+        if (up) 
+            newmodifiers &= ~modifier;
+        else 
+            newmodifiers |= modifier;
+    }
+
+    return newmodifiers;
+}
 static bool ext_sequence = false;
+static uint16_t modifiers = 0; /* state for modifiers */
 static void keyboard_isr(struct regs regs)
 {
     (void)regs;
-
     uint8_t scancode = inb(DATA_PORT);
-    
-    kprintf("0x%02x", scancode);
 
     if (scancode != 0xE0) {
+        bool up = scancode & 0x80;
+        scancode = scancode & (~0x80); /* strip off the up/down flag */
         uint8_t keycode = ext_sequence ? keymap_ext[scancode] : keymap[scancode];
-        kprintf(":0x%02x\n", keycode);
+        modifiers = update_modifier(modifiers, scancode, up);
 
+        key_event_t event = {
+            .keycode = keycode,
+            .modifiers = modifiers,
+            .action = up ? KEY_ACT_UP : KEY_ACT_DOWN
+        };
+
+        if (handler) 
+            handler(event);
+        
         ext_sequence = false;
     }
     else {
         ext_sequence = true;
-        kprintf(" ");
     } 
 }
 
