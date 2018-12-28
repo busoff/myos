@@ -9,6 +9,7 @@ C_FLAGS := -g -std=gnu11 -ffreestanding -fno-stack-protector -Wall -Wextra -Werr
 C_SRC := main.c arch/gdt.c arch/isr.c arch/irq.c arch/idt.c arch/port.c
 C_SRC += stdlib/io.c stdlib/string.c stdlib/kprintf.c
 C_SRC += driver/keyboard.c  driver/screen.c
+C_SRC += userspace/terminal.c 
 
 ASM_SRC := arch/asm/boot.S arch/asm/gdt.S arch/asm/isr.S arch/asm/idt.S arch/asm/irq.S
 

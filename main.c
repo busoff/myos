@@ -9,11 +9,7 @@
 
 #include "kstdlib.h"
 
-static void keyboard_handler(key_event_t event)
-{
-    kprintf("keycode: %d modifier: %02x action: %d\n", 
-        event.keycode, event.modifiers, event.action);
-}
+#include "userspace/terminal.h"
 
 void kmain(void* multiboot_information, uint32_t magic_number)
 {
@@ -25,9 +21,9 @@ void kmain(void* multiboot_information, uint32_t magic_number)
 
     keyboard_init();
 
-    keyboard_register(keyboard_handler);
-
     irq_enable();
+
+    term_init();
 
     kprintf("==%c===%s %d\n", '!', "Hello MyOS\nhello again");
 
