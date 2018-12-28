@@ -1,9 +1,9 @@
-KERNEL_PREFIX := i686-elf-
+# KERNEL_PREFIX := i386-elf-
 
 CC := ${KERNEL_PREFIX}gcc
 AS := ${KERNEL_PREFIX}as
 
-INCLUDE_PATH := -Istdlib -I.
+INCLUDE_PATH := -Istdlib -I. -Iinclude
 C_FLAGS := -g -std=gnu11 -ffreestanding -fno-stack-protector -Wall -Wextra -Werror ${INCLUDE_PATH}
 
 C_SRC := main.c arch/gdt.c arch/isr.c arch/irq.c arch/idt.c arch/port.c
