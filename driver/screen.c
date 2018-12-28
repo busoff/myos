@@ -3,7 +3,6 @@
 
 static const uint8_t WIDTH = 80;
 static const uint8_t HEIGHT = 25;
-static const uint32_t VIDEO_BUF_BASE = 0xB8000;
 
 static uint8_t currentx = 0;
 static uint8_t currenty = 0;
