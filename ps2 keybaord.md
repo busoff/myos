@@ -9,7 +9,11 @@ You can send a command (one byte) to keyboard. Then the keyboard either
 For some commands which have data bytes, they require the data bytes should be sent after their command byte.
 
 ## Scan code
-Keyboard use scan code to represent an keybobard event that which key is pressed or released. A scan code is a sequence of bytes. It could be one byte, two byte ...
+Keyboard use scan code to represent an keybobard event that which key is pressed or released. A scan code is a sequence of bytes. Normally the scan code is one byte value.
+
+release-scancode(key) = 0x8 | press-scancode(key)
+
+A scan code sequence begins with `0xE0` or `0xE1`. While `0xE0` is used to expand code space. and the `0xE1` means ??? 
 
 ## port
 
@@ -195,3 +199,5 @@ Key codes are numeric values that correspond to physical keys on the keyboard bu
 
 ## Reference
 - https://wiki.osdev.org/Keyboard
+- https://www.win.tue.nl/~aeb/linux/kbd/scancodes-1.html
+
