@@ -163,6 +163,9 @@ static void keyboard_isr(struct regs regs)
             .action = up ? KEY_ACT_UP : KEY_ACT_DOWN
         };
 
+        // kprintf("s=%02x k=%02x m=%02x a=%d\n", 
+        //     scancode, event.keycode, event.modifiers, event.action);
+
         if (handler) 
             handler(event);
         
