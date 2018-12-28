@@ -8,7 +8,7 @@
 static const uint32_t KEYBOARD_IRQ = 1;
 static const uint8_t DATA_PORT = 0x60;
 
-static uint16_t keymap[256] = {
+static kbd_key_t keymap[256] = {
 /* 00 */  KEY_RESERVED, KEY_ESC,       KEY_1,         KEY_2,         KEY_3,         KEY_4,        KEY_5,         KEY_6,
 /* 08 */  KEY_7,        KEY_8,         KEY_9,         KEY_0,         KEY_MINUS,     KEY_EQUAL,    KEY_BACKSPACE, KEY_TAB,
 /* 10 */  KEY_Q,        KEY_W,         KEY_E,         KEY_R,         KEY_T,         KEY_Y,        KEY_U,         KEY_I,
@@ -43,7 +43,7 @@ static uint16_t keymap[256] = {
 /* f8 */  KEY_RESERVED, KEY_RESERVED,  KEY_RESERVED,  KEY_RESERVED,  KEY_RESERVED,  KEY_RESERVED, KEY_RESERVED,  KEY_RESERVED};
 
 /* keymap for 0xe0 scan sequence */
-uint16_t keymap_ext[256] = {
+kbd_key_t keymap_ext[256] = {
 /*              00          01             02             03               04             05             06           07     */    
 /* 00 */  KEY_RESERVED, KEY_RESERVED,  KEY_RESERVED,  KEY_RESERVED,  KEY_RESERVED,  KEY_RESERVED, KEY_RESERVED,  KEY_RESERVED,
 /* 08 */  KEY_RESERVED, KEY_RESERVED,  KEY_RESERVED,  KEY_RESERVED,  KEY_RESERVED,  KEY_RESERVED, KEY_RESERVED,  KEY_RESERVED,
@@ -86,10 +86,10 @@ void keyboard_register(kbd_handler_func func)
 }
 
 
-static uint16_t update_modifier(uint16_t modifiers, uint8_t keycode, bool up)
+static kbd_mod_t update_modifier(kbd_mod_t modifiers, uint8_t keycode, bool up)
 {
-    uint8_t modifier = 0;
-    uint16_t newmodifiers = modifiers;
+    kbd_mod_t modifier = 0;
+    kbd_mod_t newmodifiers = modifiers;
 
     /* 
      * update LOCK modifier 
@@ -145,7 +145,7 @@ static uint16_t update_modifier(uint16_t modifiers, uint8_t keycode, bool up)
     return newmodifiers;
 }
 static bool ext_sequence = false;
-static uint16_t modifiers = 0; /* state for modifiers */
+static kbd_mod_t modifiers = 0; /* state for modifiers */
 static void keyboard_isr(struct regs regs)
 {
     (void)regs;
@@ -154,7 +154,7 @@ static void keyboard_isr(struct regs regs)
     if (scancode != 0xE0) {
         bool up = scancode & 0x80;
         scancode = scancode & (~0x80); /* strip off the up/down flag */
-        uint8_t keycode = ext_sequence ? keymap_ext[scancode] : keymap[scancode];
+        kbd_key_t keycode = ext_sequence ? keymap_ext[scancode] : keymap[scancode];
         modifiers = update_modifier(modifiers, scancode, up);
 
         key_event_t event = {
