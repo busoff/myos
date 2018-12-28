@@ -1,1 +1,2 @@
 - [x] implement kprintf in kstdlib.h
+- [x] "DEL" keystrok seems doesn't work 
